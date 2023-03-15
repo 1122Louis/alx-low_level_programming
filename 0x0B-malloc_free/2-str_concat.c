@@ -1,5 +1,6 @@
 #include "main.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  *str_concat - a function that concatenates two strings.
@@ -31,7 +32,7 @@ char *str_concat(char *s1, char *s2)
 		p[new_index++] = s1[index];
 
 	for (index = 0; s2[index]; index++)
-		p[new_index++] = s2 [index];
+		p[new_index++] = s2[index];
 
 	return (p);
 }
