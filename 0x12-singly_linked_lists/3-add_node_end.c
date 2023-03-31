@@ -1,43 +1,48 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "lists.h"
 
 /**
- * add_node_end - Adds a new node at the end of a list
- *@head: pointer to the head of the list
- *@str: string to be added to the list
- *
- *Return: NULL in case of failure
- *or address or the element
-*/
+ * add_node_end - Entry point
+ * Description: Adds new node at the end of a list_t list
+ * @head: Pointer to pointer to the head node of the list
+ * @str: String stored in the new node
+ * Return: Address of the new element, or NULL if it failed
+ */
 
 list_t *add_node_end(list_t **head, const char *str)
 {
-	int len;
-	list_t *new, *last;
+	list_t *new, *current;
 
-	new = malloc(sizeof(list_t));
-	if (new == NULL)
+	if (!head)
 		return (NULL);
-
-	if (str == NULL)
+	new = malloc(sizeof(list_t));
+	if (!new)
+		return (NULL);
+	/* Duplicate the string */
+	new->str = strdup(str);
+	if (!new->str)
 	{
 		free(new);
 		return (NULL);
 	}
-
-	for (len = 0; str[len];)
-		len++;
-
-	new->len = len;
+	/* Count the number of characters within square brackets */
+	new->len = strlen(str);
 	new->next = NULL;
-
-	if (*head == NULL)
-		*head = new;
-	else
+	/* If the list is empty, the new node becomes the head */
+	if (!*head)
 	{
-		last = *head;
-		while (last->next != NULL)
-			last = last->next;
-		last->next = new;
+		*head = new;
+		return (new);
 	}
-	return (*head);
+	current = *head;
+	/* Traverse the list until the last node is reached */
+	while (current->next)
+	{
+		current = current->next;
+	}
+	/* Add the new node to the end of the list */
+	current->next = new;
+	return (new);
 }
