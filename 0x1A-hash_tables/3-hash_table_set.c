@@ -1,75 +1,50 @@
 #include "hash_tables.h"
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-
 /**
- * hash_table_set - add an element to a hash table
- * @ht: hash table to add to
- * @key: index to add element in the hash table
- * @value: value of the element
- * Return: 1 if succeeded, 0 otherwise
+ * hash_table_set - adds an element to the hash table.
+ * @ht: hash table for to add or update the key/value
+ * @key: key string
+ * @value: value associated with the key.
+ * Return: 1 if it succeeded, 0 otherwise
  */
 int hash_table_set(hash_table_t *ht, const char *key, const char *value)
 {
-	unsigned long int index = 0;
-	hash_node_t *node = NULL, *tmp, *result;
+	unsigned long int index;
+	hash_node_t *new_node, *ptr;
+	char *new_value;
 
-	if (strlen(key) == 0)
+	if (ht == NULL || key == NULL || *key == 0 || value == NULL)
 		return (0);
-
-	index = key_index((const unsigned char *)key, ht->size);
-	tmp = node = ht->array[index];
-
-	while (tmp)
+	/* Gives you the index of a key*/
+	index = key_index((const unsigned char *) key, ht->size);
+	ptr = ht->array[index];
+	while (ptr != NULL)
 	{
-		if (strcmp(tmp->key, key) == 0)
-		{
-			free(tmp->value);
-			tmp->value = strdup(value);
-			if (tmp->value == NULL)
-				return (0);
-			return (1);
-		}
-		tmp = tmp->next;
+		if (strcmp(ptr->key, key) == 0) /*Compare values*/
+			break;
+		ptr = ptr->next;
 	}
-
-	result = add_node(&node, key, value);
-
-	if (result == NULL)
-		return (0);
-
-	ht->array[index] = result;
-
+	if (ptr == NULL)
+	{
+		new_node = malloc(sizeof(hash_node_t));
+		if (new_node == NULL) /*Handle errors*/
+			return (0);
+		new_node->key = strdup(key); /*Copy key*/
+		if (new_node->key == NULL)
+			return (0);
+		new_node->value = strdup(value); /*Copy value*/
+		if (new_node->value == NULL)
+			return (0);
+		new_node->next = ht->array[index];
+		ht->array[index] = new_node;
+	}
+	else
+	{
+		new_value = strdup(value); /*Copy value*/
+		if (new_value == NULL)
+			return (0);
+		free(ptr->value);
+		ptr->value = new_value;
+	}
 	return (1);
-}
-
-/**
- * add_node - add a new node to the beginning of a hash_node_t list
- * @head: beginning of list
- * @key: key of the hash element
- * @value: value of the hash element
- * Return: address of the new element, NULL on failure
- */
-hash_node_t *add_node(hash_node_t **head, const char *key, const char *value)
-{
-	hash_node_t *new;
-
-	new = malloc(sizeof(hash_node_t));
-	if (new == NULL)
-		return (NULL);
-
-	new->key = strdup(key);
-	new->value = strdup(value);
-	if (new->key == NULL || new->value == NULL)
-	{
-		free(new);
-		return (NULL);
-	}
-
-	new->next = *head;
-
-	*head = new;
-
-	return (new);
 }
