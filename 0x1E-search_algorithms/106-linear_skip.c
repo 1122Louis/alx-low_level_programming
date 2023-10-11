@@ -2,49 +2,42 @@
 #include "search_algos.h"
 
 /**
-* jump_list - Searches for a value in a sorted singly
-* linked list using jump search.
-* @list: Pointer to the head of the list to search in.
-* @size: Number of nodes in the list.
+* linear_skip - Searches for a value in a sorted skip list of integers.
+* @list: Pointer to the head of the skip list to search in.
 * @value: The value to search for.
 *
 * Return: Pointer to the first node where value is located,
 * or NULL if not found.
 */
-listint_t *jump_list(listint_t *list, size_t size, int value)
+skiplist_t *linear_skip(skiplist_t *list, int value)
 {
-size_t jump = sqrt(size);
-listint_t *prev = list;
-listint_t *curr = list;
-size_t i;
+skiplist_t *node, *jump;
 
-if (list == NULL || size == 0)
+if (list == NULL)
 return (NULL);
 
-while (curr->index < size - 1 && curr->n < value)
+for (node = jump = list; jump->next != NULL && jump->n < value;)
 {
-prev = curr;
-for (i = 0; i < jump && curr->next; i++)
-curr = curr->next;
-
-printf("Value checked at index [%lu] = [%d]\n", curr->index, curr->n);
-
-if (curr->n >= value)
-break;
+node = jump;
+if (jump->express != NULL)
+{
+jump = jump->express;
+printf("Value checked at index [%ld] = [%d]\n",
+jump->index, jump->n);
+}
+else
+{
+while (jump->next != NULL)
+jump = jump->next;
+}
 }
 
-printf("Value found between indexes [%lu] and [%lu]\n",
-	prev->index, curr->index);
+printf("Value found between indexes [%ld] and [%ld]\n",
+node->index, jump->index);
 
-while (prev != NULL && prev->index <= curr->index)
-{
-printf("Value checked at index [%lu] = [%d]\n", prev->index, prev->n);
+for (; node->index < jump->index && node->n < value; node = node->next)
+printf("Value checked at index [%ld] = [%d]\n", node->index, node->n);
+printf("Value checked at index [%ld] = [%d]\n", node->index, node->n);
 
-if (prev->n == value)
-return (prev);
-
-prev = prev->next;
-}
-
-return (NULL);
+return (node->n == value ? node : NULL);
 }
